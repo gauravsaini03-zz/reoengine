@@ -82,8 +82,4 @@ public class RecommendationEngine {
 		return db.GetCustomerByID(id);
 	}
 	
-	public ArrayList<Customer> GetCustomer(int id) {
-		return db.GetCustomer(id);
-	}
-	
 }

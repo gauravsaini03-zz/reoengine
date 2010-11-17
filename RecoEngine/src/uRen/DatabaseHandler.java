@@ -120,9 +120,10 @@ public class DatabaseHandler {
 		return resultRows;
 	}
 	
-	public ArrayList<Customer> GetCustomer(int id) {
+	public ArrayList<Customer> ForceCustomerCacheUpdate(/*int id*/) {
 		ResultSet results=null;
 		
+		/*
 		if (true == customerCacheValid) {
 			
 			if (-1==id) return customerCache; //return complete list from cache
@@ -135,6 +136,7 @@ public class DatabaseHandler {
 			}//end for (search)
 			return matches;
 		}//end if
+		*/
 		
 		//cache is invalid, so delete what we have in memory...
 		customerCache.clear();
@@ -146,13 +148,13 @@ public class DatabaseHandler {
 			
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-			String command = "";
+			String command = "select * from Customer;";
 			//check id, if it is -1, send back all rows
-			if (-1==id) {
+			/*if (-1==id) {
 				command = "select * from Customer;";
 			} else {
 				command = "select * from Customer where idCustomer=" + id + ";";
-			}
+			}*/
 			Logger.Log("command: " + command);
 			results = stmt.executeQuery(command);
 			
@@ -181,9 +183,10 @@ public class DatabaseHandler {
 		return customerCache;
 	}
 	
-	public ArrayList<Album> GetAlbum(int id) {
+	public ArrayList<Album> ForceAlbumCacheUpdate(/*int id*/) {
 		ResultSet results=null;
 		
+		/*
 		if (true == albumCacheValid) {
 			
 			if (-1==id) return albumCache; //return complete list from cache
@@ -196,6 +199,7 @@ public class DatabaseHandler {
 			}//end for (search)
 			return matches;
 		}//end if
+		*/
 		
 		//cache is invalid, so delete what we have in memory...
 		albumCache.clear();
@@ -207,13 +211,13 @@ public class DatabaseHandler {
 			
 			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-			String command = "";
+			String command = "select * from Album;";
 			//check id, if it is -1, send back all rows
-			if (-1==id) {
+			/*if (-1==id) {
 				command = "select * from Album;";
 			} else {
 				command = "select * from Album where idAlbum=" + id + ";";
-			}
+			}*/
 			Logger.Log("command: " + command);
 			results = stmt.executeQuery(command);
 			
@@ -245,7 +249,7 @@ public class DatabaseHandler {
 	
 	public Customer GetCustomerByEmailAddress(String emailAddress) {
 		if (false == customerCacheValid) {
-			GetCustomer(-1); //force read of customer table
+			ForceCustomerCacheUpdate(); //force read of customer table
 		}
 		
 		Customer user = new Customer();
@@ -264,7 +268,7 @@ public class DatabaseHandler {
 	
 	public Customer GetCustomerByID(int id) {
 		if (false == customerCacheValid) {
-			GetCustomer(-1); //force read of customer table
+			ForceCustomerCacheUpdate(); //force read of customer table
 		}
 		
 		Customer user = new Customer();
@@ -279,6 +283,44 @@ public class DatabaseHandler {
 		}
 		
 		return matchFound == true ? user : null; 
+	}
+	
+	public Album GetAlbumByName(String artistName, String albumName) {
+		if (false == albumCacheValid) {
+			ForceAlbumCacheUpdate(); //force read of album table
+		}
+		
+		Album alb = new Album();
+		boolean matchFound = false;
+		for (Album album : albumCache) {
+			if ( artistName == album.getArtistName() && albumName == album.getAlbumName() ) {
+				//found a match!
+				matchFound = true;
+				alb.Clone(album);
+				break; //stop searching
+			}
+		}
+		
+		return matchFound == true ? alb : null; 
+	}
+	
+	public Album GetAlbumByID(int id) {
+		if (false == albumCacheValid) {
+			ForceAlbumCacheUpdate(); //force read of album table
+		}
+		
+		Album alb = new Album();
+		boolean matchFound = false;
+		for (Album album : albumCache) {
+			if ( id == album.getID() ) {
+				//found a match!
+				matchFound = true;
+				alb.Clone(album);
+				break; //stop searching
+			}
+		}
+		
+		return matchFound == true ? alb : null; 
 	}
 	
 	
