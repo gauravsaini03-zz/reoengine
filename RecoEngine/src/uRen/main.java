@@ -27,6 +27,7 @@ public class main extends HttpServlet {
 	public static final String DOCTYPE = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">";
 
 	RecommendationEngine engine = new RecommendationEngine();
+	XMLSerializer serializerXML = new XMLSerializer();
 
 	/**
 	 * @see HttpServlet#HttpServlet()
@@ -82,12 +83,7 @@ public class main extends HttpServlet {
 		}
 		out.println("</TABLE>\n</BODY></HTML>");
 		*/
-		/*
-		List<String> results = engine.GetRecommendationsForUser("aero9", "aero9@gmail.com");
-		for (String s : results) {
-			out.println(s + "<br>");
-		}
-		*/
+
 		String email = "aero9@gmail.com";
 		Customer user = engine.GetCustomerByEmailAddress(email);
 		Recommendation results = new Recommendation(user);
@@ -98,24 +94,8 @@ public class main extends HttpServlet {
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
 		results.AddRecommendationList(engine.GetRecommendations_alg4());
 
-		// Create output stream.
-		ByteOutputStream bos = new ByteOutputStream();
-		//FileOutputStream fos = new FileOutputStream("c:\\temp\\foo.xml");
-		// Create XML encoder.
-		XMLEncoder xenc = new XMLEncoder(bos);
-		// Write object.
-		xenc.writeObject(results);
-		xenc.flush();
-		String xmlOut = bos.toString();
-		out.println(xmlOut);
-		Logger.Log(xmlOut);
-		
-		BufferedWriter fout = new BufferedWriter(new FileWriter("c:\\temp\\out.xml"));
-		fout.write(xmlOut);
-		fout.close();
-
-
 		//serialize results, and we're done! :)
+		out.println(serializerXML.Serialize(results, "c:\\temp\\out.xml"));
 
 //		for (int i=0; i<100; i++) {
 //			engine.TestDBInsertUser("user_fn_" + i, "user_ln_" + i, "nick_" + i, "email_" + i + "@mailprov.com");
