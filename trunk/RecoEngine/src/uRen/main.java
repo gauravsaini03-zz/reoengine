@@ -95,8 +95,13 @@ public class main extends HttpServlet {
 		results.AddRecommendationList(engine.GetRecommendations_alg4());
 
 		//serialize results, and we're done! :)
-		out.println(serializerXML.Serialize(results, "c:\\temp\\out.xml"));
-
+		out.println("Hello, World! These are the results :)<br><br>");
+		out.println("<pre>");
+		String output = serializerXML.Serialize(results, "c:\\temp\\out.xml");
+		output = output.replace("<", "&lt");
+		output = output.replace(">", "&gt");
+		out.println(output);
+		out.println("</pre>");
 //		for (int i=0; i<100; i++) {
 //			engine.TestDBInsertUser("user_fn_" + i, "user_ln_" + i, "nick_" + i, "email_" + i + "@mailprov.com");
 //			Logger.Log("entered " + i);

@@ -18,32 +18,33 @@ public class RecommendationEngine {
 	}
 
 	public ArrayList<Album> GetRecommendations_alg1(Customer cust, String artist) {
-		ArrayList<Album> results = new ArrayList<Album>();
-		results.add(new Album(99, "darkside of the moon", "pink floyd", "rock", 100));
-		return results;
+		//ArrayList<Album> results = new ArrayList<Album>();
+		//results.add(new Album(99, "darkside of the moon", "pink floyd", "rock", 100));
+		Purchase list = db.GetAlbumsPurchaseByCustomer(cust);
+		return list.getPurchases();
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg2a(Customer cust, String genre) {
 		ArrayList<Album> results = new ArrayList<Album>();
-		results.add(new Album(98, "darkside of the moon2a", "pink floyd", "rock", 100));
+		//results.add(new Album(98, "darkside of the moon2a", "pink floyd", "rock", 100));
 		return results;
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg2b(Customer cust) {
 		ArrayList<Album> results = new ArrayList<Album>();
-		results.add(new Album(97, "darkside of the moon2b", "pink floyd", "rock", 100));
+		//results.add(new Album(97, "darkside of the moon2b", "pink floyd", "rock", 100));
 		return results;
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg3(Customer cust) {
 		ArrayList<Album> results = new ArrayList<Album>();
-		results.add(new Album(96, "darkside of the moon3", "pink floyd", "rock", 100));
+		//results.add(new Album(96, "darkside of the moon3", "pink floyd", "rock", 100));
 		return results;
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg4() {
 		ArrayList<Album> results = new ArrayList<Album>();
-		results.add(new Album(95, "darkside of the moon4", "pink floyd", "rock", 100));
+		//results.add(new Album(95, "darkside of the moon4", "pink floyd", "rock", 100));
 		return results;
 	}
 	
@@ -71,7 +72,7 @@ public class RecommendationEngine {
 	
 	
 	public void TestDBInsertUser(String fname, String lname, String nname, String email) {
-		db.InsertIntoToUserTable(fname, lname, nname, email);
+		db.InsertIntoCustomerTable(fname, lname, nname, email);
 	}
 	
 	public Customer GetCustomerByEmailAddress(String email) {
