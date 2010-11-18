@@ -31,11 +31,37 @@ public class DatabaseHandler {
 		albumCacheValid = false;
 		
 		//todo: i still need to finalize the purchase database design, and build it in memory
-		purchaseCacheValid = false;
+		//decided not to maintain a cache for the purchase table...
+		//purchaseCacheValid = false;
+	}
+	
+	public int InserIntoPurchaseTable(int albumID, int customerID) {
+		int resultRows=-1;
+		
+		try {
+			Class.forName(SessionSettings.ConnectorString);
+			Connection con = DriverManager.getConnection(SessionSettings.ServerUrl + SessionSettings.Database,
+													SessionSettings.Username, SessionSettings.Password);
+			Statement stmt = con.createStatement();
+
+			String command = "insert into Purchase (Customer_idCustomer, Album_idAlbum, date) values (" +
+			"\"" + customerID + "\"," +
+			"\"" + albumID + "\"," +
+			"NOW())";
+			Logger.Log("insert command: " + command);
+			resultRows = stmt.executeUpdate(command);
+			con.close();
+			Logger.Log("Success!");
+		}
+		catch (Exception ex) {
+			Logger.Log(ex.getMessage());
+			resultRows = -1;
+		}
+		return resultRows;
 	}
 	
 	//insert into Users database
-	public int InsertIntoToUserTable(String firstName, String lastName, String nickName, String emailAddress) { //+age?, nickName [unique]
+	public int InsertIntoCustomerTable(String firstName, String lastName, String nickName, String emailAddress) { //+age?, nickName [unique]
 		int resultRows=-1;
 		
 		try {
@@ -63,7 +89,7 @@ public class DatabaseHandler {
 	}
 	
 	//Insert into Albums Database 
-	public int InsertIntoToAlbumDatabase(String artist, String name, String genre, int price) {
+	public int InsertIntoToAlbumTable(String artist, String name, String genre, int price) {
 		int resultRows=-1;
 		
 		try {
@@ -323,5 +349,51 @@ public class DatabaseHandler {
 		return matchFound == true ? alb : null; 
 	}
 	
+	/*
+	 * select * from Purchase join Album on Purchase.Album_idAlbum = Album.idAlbum;
+	 * insert into Purchase (Customer_idCustomer, Album_idAlbum, date) values (1, 2, NOW());
+	 */
+	
+	//function to get the albums purchased by a particular customer
+	public Purchase GetAlbumsPurchaseByCustomer(Customer cust) {
+		ArrayList<Album> purchases = new ArrayList<Album>();
+		
+		ResultSet results = null; //holds the result of the sql query
+		
+		String command="select * from Purchase join Album on Purchase.Album_idAlbum = Album.idAlbum where Customer_idCustomer = 1";
+		
+		try {
+			Class.forName(SessionSettings.ConnectorString);
+			Connection con = DriverManager.getConnection(SessionSettings.ServerUrl + SessionSettings.Database,
+													SessionSettings.Username, SessionSettings.Password);
+			
+			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+			Logger.Log("command: " + command);
+
+			results = stmt.executeQuery(command);
+			
+			while (results.next()) {
+				//int pid = results.getInt(SessionSettings.Purchase_idPurchase);
+				int aid = results.getInt(SessionSettings.Purchase_Join_idAlbum);
+				String alname = results.getString(SessionSettings.Purchase_Join_albumName);
+				String arname = results.getString(SessionSettings.Purchase_Join_artistName);
+				String genre = results.getString(SessionSettings.Purchase_Join_genre);
+				int price = results.getInt(SessionSettings.Purchase_Join_price);
+				
+				Album album = new Album(aid, alname, arname, genre, price);
+				purchases.add(album);
+			}
+			
+			con.close();
+			Logger.Log("Success!");
+		}
+		catch (Exception ex) {
+			Logger.Log(ex.getMessage());
+			results = null;
+		}
+		Purchase purchase = new Purchase(cust, purchases);
+		return purchase;
+	}
 	
 }

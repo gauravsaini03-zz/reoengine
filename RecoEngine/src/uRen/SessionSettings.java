@@ -24,5 +24,17 @@ public abstract class SessionSettings {
   	public static String Album_artistName = "artistName";
   	public static String Album_genre = "genre";
   	public static String Album_price = "price";
+  	
+  	//Purchase Table
+  	public static String Purchase_idPurchase = "idPurchase";
+  	public static String Purchase_Customer_idCustomer = "Customer_idCustomer";
+  	public static String Purchase_Album_idAlbum = "Album_idAlbum";
+  	public static String Purchase_date = "date";
+  	//Purchase table with the table join with Album
+  	public static String Purchase_Join_idAlbum = "idAlbum";
+  	public static String Purchase_Join_albumName = "albumName";
+  	public static String Purchase_Join_artistName = "artistName";
+  	public static String Purchase_Join_genre = "genre";
+  	public static String Purchase_Join_price = "price";
 	
 }
