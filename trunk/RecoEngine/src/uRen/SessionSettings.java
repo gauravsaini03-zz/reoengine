@@ -11,6 +11,9 @@ public abstract class SessionSettings {
 	public static String Username = "dbAccessor";
 	public static String Password = "dbpasswd";
 	
+	//recommendation settings
+	public static int SonnyCorleone = 2;
+	
 	//Customer DataBase
 	public static String Customer_idCustomer = "idCustomer";
 	public static String Customer_firstName = "firstName";

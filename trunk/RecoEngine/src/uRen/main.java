@@ -1,21 +1,14 @@
 package uRen;
 
 
-import java.beans.XMLEncoder;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
 import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 
 /**
  * Servlet implementation class main
@@ -86,9 +79,13 @@ public class main extends HttpServlet {
 
 		String email = "aero9@gmail.com";
 		Customer user = engine.GetCustomerByEmailAddress(email);
+		Purchase userPurchases = engine.GetPurchasesByCustomer(user);
+		
 		Recommendation results = new Recommendation(user);
 		
-		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "artist"));
+		results.AddAlbumsPurchased(userPurchases.getPurchases());
+		
+		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "pink floyd"));
 		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "artist"));
 		results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
@@ -102,22 +99,6 @@ public class main extends HttpServlet {
 		output = output.replace(">", "&gt");
 		out.println(output);
 		out.println("</pre>");
-//		for (int i=0; i<100; i++) {
-//			engine.TestDBInsertUser("user_fn_" + i, "user_ln_" + i, "nick_" + i, "email_" + i + "@mailprov.com");
-//			Logger.Log("entered " + i);
-//		}
-		/*
-		ArrayList<Customer> customers = engine.GetCustomer(-1); //pass in -1 for all
-		for (Customer customer : customers) {
-			int cid = customer.getID();
-			String fname = customer.getFirstName();
-			String lname = customer.getLastName();
-			String nname = customer.getNickName();
-			String email = customer.getEmailAddress();
-			String output = "[" + cid + "] " +lname + ", " + fname + " (" + nname + ") " + " : " + email;
-			out.println(output + "<br>");
-		}
-		*/
 
 	}
 
