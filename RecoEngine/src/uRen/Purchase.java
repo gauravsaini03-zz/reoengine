@@ -9,7 +9,11 @@ public class Purchase {
 	
 	public Purchase(Customer cust, ArrayList<Album> purchases) {
 		this.cust = cust;
-		this.purchases = purchases;
+		if (null == purchases) {
+			this.purchases = new ArrayList<Album>();
+		} else {
+			this.purchases = purchases;
+		}
 	}
 
 	public Customer getCust() {
@@ -28,5 +32,8 @@ public class Purchase {
 		this.purchases = purchases;
 	}
 	
+	public void AddAlbumToPurchases(Album alb) {
+		purchases.add(alb);
+	}
 	
 }

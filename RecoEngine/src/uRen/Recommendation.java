@@ -13,13 +13,22 @@ public class Recommendation implements Serializable{
 	private Customer user;
 	private ArrayList<Album> recommendations;
 	
+	private ArrayList<Album> purchased;
+	
 	public Recommendation() {
 		
 	}
 	
 	public Recommendation (Customer cust) {
 		user = new Customer(cust);
-		recommendations = new ArrayList<Album>();		
+		recommendations = new ArrayList<Album>();
+		purchased = new ArrayList<Album>();
+	}
+	
+	public void AddAlbumsPurchased(ArrayList<Album> purchased) {
+		for(Album album : purchased) {
+			this.purchased.add(album);
+		}
 	}
 	
 	public void AddRecommendationList(ArrayList<Album> list) {
@@ -30,6 +39,14 @@ public class Recommendation implements Serializable{
 	
 	public void AddRecommendation(Album alb) {
 		
+		//check if he's already bought it...
+		for (Album album : purchased) {
+			if (album.getID() == alb.getID()) {
+				return; //stop! he's already bought this one, no point inserting it
+			}
+		}
+		
+		//check if he's already been recommended it
 		boolean alreadyExists = false;
 		for (Album album : recommendations) {
 			if (album.getID() == alb.getID()) {

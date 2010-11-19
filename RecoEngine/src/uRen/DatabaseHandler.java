@@ -280,6 +280,7 @@ public class DatabaseHandler {
 		
 		Customer user = new Customer();
 		boolean matchFound = false;
+		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Customer cust : customerCache) {
 			if ( 0 == cust.getEmailAddress().compareToIgnoreCase(emailAddress) ) {
 				//found a match!
@@ -299,6 +300,7 @@ public class DatabaseHandler {
 		
 		Customer user = new Customer();
 		boolean matchFound = false;
+		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Customer cust : customerCache) {
 			if ( id == cust.getIdCustomer() ) {
 				//found a match!
@@ -318,6 +320,7 @@ public class DatabaseHandler {
 		
 		Album alb = new Album();
 		boolean matchFound = false;
+		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Album album : albumCache) {
 			if ( artistName == album.getArtistName() && albumName == album.getAlbumName() ) {
 				//found a match!
@@ -337,6 +340,7 @@ public class DatabaseHandler {
 		
 		Album alb = new Album();
 		boolean matchFound = false;
+		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Album album : albumCache) {
 			if ( id == album.getID() ) {
 				//found a match!
@@ -351,16 +355,19 @@ public class DatabaseHandler {
 	
 	/*
 	 * select * from Purchase join Album on Purchase.Album_idAlbum = Album.idAlbum;
+	 * 
+	 * insert into Customer (firstName, lastName, nickName, emailAddress) values ("varun", "khurana", "varunk", "varunk@gmail.com");
 	 * insert into Purchase (Customer_idCustomer, Album_idAlbum, date) values (1, 2, NOW());
+	 * select * from Purchase join Album on Purchase.Album_idAlbum=Album.idAlbum where Album.artistName = "pink floyd" order by Purchase.Customer_idCustomer;
 	 */
 	
 	//function to get the albums purchased by a particular customer
-	public Purchase GetAlbumsPurchaseByCustomer(Customer cust) {
+	public Purchase GetAlbumsPurchasedByCustomer(Customer cust) {
 		ArrayList<Album> purchases = new ArrayList<Album>();
 		
 		ResultSet results = null; //holds the result of the sql query
 		
-		String command="select * from Purchase join Album on Purchase.Album_idAlbum = Album.idAlbum where Customer_idCustomer = 1";
+		String command="select * from Purchase join Album on Purchase.Album_idAlbum = Album.idAlbum where Customer_idCustomer = " + cust.getIdCustomer();
 		
 		try {
 			Class.forName(SessionSettings.ConnectorString);
@@ -394,6 +401,60 @@ public class DatabaseHandler {
 		}
 		Purchase purchase = new Purchase(cust, purchases);
 		return purchase;
+	}
+	
+	public ArrayList<Purchase> GetPurchasesByArtist(int CustID, String artist) {
+		ArrayList<Purchase> purchaseList = new ArrayList<Purchase>();
+		ResultSet results = null; //holds the result of the sql query
+		String command = 	"select * from Purchase join Album " + "" +
+							"on Purchase.Album_idAlbum=Album.idAlbum " +
+							"where Album.artistName = \"" + artist +
+							"\" and Purchase.Customer_idCustomer <> " + CustID +
+							" order by Purchase.Customer_idCustomer;";
+		
+		try {
+			Class.forName(SessionSettings.ConnectorString);
+			Connection con = DriverManager.getConnection(SessionSettings.ServerUrl + SessionSettings.Database,
+													SessionSettings.Username, SessionSettings.Password);
+			
+			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+			Logger.Log("command: " + command);
+
+			results = stmt.executeQuery(command);
+			int oldCid = 0;
+			Customer cust = null;
+			Purchase custPurchase = null;
+			while (results.next()) {
+				int cid = results.getInt(SessionSettings.Purchase_Customer_idCustomer);
+				if (cid != oldCid) {
+					cust = GetCustomerByID(cid);
+					purchaseList.add(GetAlbumsPurchasedByCustomer(cust));
+					oldCid = cid;
+					//custPurchase = new Purchase(cust, null);
+					//custPurchase.setPurchases(GetAlbumsPurchasedByCustomer(cust).getPurchases());
+				}
+				/*
+				int aid = results.getInt(SessionSettings.Purchase_Join_idAlbum);
+				String alname = results.getString(SessionSettings.Purchase_Join_albumName);
+				String arname = results.getString(SessionSettings.Purchase_Join_artistName);
+				String genre = results.getString(SessionSettings.Purchase_Join_genre);
+				int price = results.getInt(SessionSettings.Purchase_Join_price);
+				
+				Album album = new Album(aid, alname, arname, genre, price);
+				custPurchase.AddAlbumToPurchases(album);
+				*/
+			}
+			purchaseList.add(custPurchase); //add the last customer!
+			con.close();
+			Logger.Log("Success!");
+		}
+		catch (Exception ex) {
+			Logger.Log(ex.getMessage());
+			results = null;
+		}
+		
+		return purchaseList;
 	}
 	
 }
