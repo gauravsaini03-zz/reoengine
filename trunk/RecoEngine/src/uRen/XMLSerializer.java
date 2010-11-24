@@ -27,7 +27,7 @@ public class XMLSerializer {
 				fout.close();
 			}
 			catch (Exception ex) {
-				
+				//not mission critical... ignore it.
 			}
 		}
 		

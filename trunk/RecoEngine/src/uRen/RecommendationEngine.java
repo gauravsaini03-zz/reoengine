@@ -36,15 +36,39 @@ public class RecommendationEngine {
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg2a(Customer cust, String genre) {
-		ArrayList<Album> results = new ArrayList<Album>();
-		//results.add(new Album(98, "darkside of the moon2a", "pink floyd", "rock", 100));
-		return results;
+		ArrayList<Purchase> recoPool = db.GetPurchasesByGenre(cust.getIdCustomer(), genre);
+		return DoT3hRecommendationMagic(recoPool);
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg2b(Customer cust) {
-		ArrayList<Album> results = new ArrayList<Album>();
-		//results.add(new Album(97, "darkside of the moon2b", "pink floyd", "rock", 100));
-		return results;
+		//get the most popular genre for this guy
+		
+		HashMap<String, Integer> genreRanks = new HashMap<String, Integer>();
+		Purchase purchases = db.GetAlbumsPurchasedByCustomer(cust);
+		
+		for(Album alb : purchases.getPurchases()) {
+			if (genreRanks.containsKey(alb.getGenre())) {
+					Integer frequency = genreRanks.get(alb.getGenre());
+					frequency++;
+					genreRanks.put(alb.getGenre(), frequency);
+				}
+				else {
+					genreRanks.put(alb.getGenre(), new Integer(0));
+				}
+		}
+		//genre ranks now contains his genre list... find the highest number!
+		String genreSelected = "";
+		Integer maxFreq=new Integer(-1);
+		Iterator it = genreRanks.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pairs = (Map.Entry)it.next();
+	        if ( ((Integer)pairs.getValue()) > maxFreq) {
+	        	genreSelected = (String) pairs.getKey();
+	        	maxFreq = (Integer) pairs.getValue();
+	        }
+	    }//finished search
+	    
+		return GetRecommendations_alg2a(cust, genreSelected);
 	}
 	
 	public ArrayList<Album> GetRecommendations_alg3(Customer cust) {
@@ -98,7 +122,7 @@ public class RecommendationEngine {
 					ranks.put(AlbumID, frequency);
 				}
 				else {
-					ranks.put(AlbumID, 0);
+					ranks.put(AlbumID, new Integer(0));
 				}
 			} //end for each album
 		} //end for each list
