@@ -85,7 +85,7 @@ public class main extends HttpServlet {
 		
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
 		
-		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "pink floyd"));
+		//results.AddRecommendationList(engine.GetRecommendations_alg1(user, "pink floyd"));
 		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "artist"));
 		results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
@@ -94,10 +94,13 @@ public class main extends HttpServlet {
 		//serialize results, and we're done! :)
 		out.println("Hello, World! These are the results :)<br><br>");
 		out.println("<pre>");
+		
 		String output = serializerXML.Serialize(results, "c:\\temp\\out.xml");
+		
 		output = output.replace("<", "&lt");
 		output = output.replace(">", "&gt");
 		out.println(output);
+		
 		out.println("</pre>");
 
 	}
