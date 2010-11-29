@@ -40,6 +40,7 @@ public class RecommendationEngine {
 		return DoT3hRecommendationMagic(recoPool);
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public ArrayList<Album> GetRecommendations_alg2b(Customer cust) {
 		//get the most popular genre for this guy
 		

@@ -62,6 +62,14 @@ CREATE TABLE Album (
 		idAlbum = id;
 	}
 	
+	public String getArtistName() {
+		return artistName;
+	}
+
+	public void setArtistName(String artistName) {
+		this.artistName = artistName;
+	}
+
 	public String getAlbumName() {
 		return albumName;
 	}
@@ -69,12 +77,7 @@ CREATE TABLE Album (
 		albumName = name;
 	}
 	
-	public String getArtistName() {
-		return artistName;
-	}
-	public void setAtristName(String name) {
-		artistName = name;
-	}
+
 	
 	public String getGenre() {
 		return genre;

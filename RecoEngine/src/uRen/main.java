@@ -86,7 +86,7 @@ public class main extends HttpServlet {
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
 		
 		//results.AddRecommendationList(engine.GetRecommendations_alg1(user, "pink floyd"));
-		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "artist"));
+		//results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "artist"));
 		results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
 		results.AddRecommendationList(engine.GetRecommendations_alg4());
