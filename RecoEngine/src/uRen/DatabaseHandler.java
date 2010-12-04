@@ -423,6 +423,60 @@ public class DatabaseHandler {
 		return purchase;
 	}
 	
+	//gets the entire purchase table for every customer other than CustID
+	public ArrayList<Purchase> GetAllPurchases(int CustID) {
+		ArrayList<Purchase> purchaseList = new ArrayList<Purchase>();
+		ResultSet results = null; //holds the result of the sql query
+		String command = 	"select * from Purchase join Album " + "" +
+							"on Purchase.Album_idAlbum=Album.idAlbum " +
+							"where Purchase.Customer_idCustomer <> " + CustID +
+							" order by Purchase.Customer_idCustomer;";
+		
+		try {
+			Class.forName(SessionSettings.ConnectorString);
+			Connection con = DriverManager.getConnection(SessionSettings.ServerUrl + SessionSettings.Database,
+													SessionSettings.Username, SessionSettings.Password);
+			
+			Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+			Logger.Log("command: " + command);
+
+			results = stmt.executeQuery(command);
+			int oldCid = 0;
+			Customer cust = null;
+			Purchase custPurchase = null;
+			while (results.next()) {
+				int cid = results.getInt(SessionSettings.Purchase_Customer_idCustomer);
+				if (cid != oldCid) {
+					cust = GetCustomerByID(cid);
+					purchaseList.add(GetAlbumsPurchasedByCustomer(cust));
+					oldCid = cid;
+					//custPurchase = new Purchase(cust, null);
+					//custPurchase.setPurchases(GetAlbumsPurchasedByCustomer(cust).getPurchases());
+				}
+				/*
+				int aid = results.getInt(SessionSettings.Purchase_Join_idAlbum);
+				String alname = results.getString(SessionSettings.Purchase_Join_albumName);
+				String arname = results.getString(SessionSettings.Purchase_Join_artistName);
+				String genre = results.getString(SessionSettings.Purchase_Join_genre);
+				int price = results.getInt(SessionSettings.Purchase_Join_price);
+				
+				Album album = new Album(aid, alname, arname, genre, price);
+				custPurchase.AddAlbumToPurchases(album);
+				*/
+			}
+			purchaseList.add(custPurchase); //add the last customer!
+			con.close();
+			Logger.Log("Success!");
+		}
+		catch (Exception ex) {
+			Logger.Log(ex.getMessage());
+			results = null;
+		}
+		
+		return purchaseList;
+	}
+	
 	public ArrayList<Purchase> GetPurchasesByArtist(int CustID, String artist) {
 		ArrayList<Purchase> purchaseList = new ArrayList<Purchase>();
 		ResultSet results = null; //holds the result of the sql query

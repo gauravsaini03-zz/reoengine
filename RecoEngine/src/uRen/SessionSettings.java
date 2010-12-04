@@ -13,6 +13,10 @@ public abstract class SessionSettings {
 	
 	//recommendation settings
 	public static int SonnyCorleone = 2;
+	public static int SimilarUsersToHunt = 2;
+	public static int AlbumWeight = 15;
+	public static int ArtistWeight = 10;
+	public static int GenreWeight = 5;
 	
 	//Customer DataBase
 	public static String Customer_idCustomer = "idCustomer";
