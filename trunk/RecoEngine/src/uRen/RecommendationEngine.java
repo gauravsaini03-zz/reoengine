@@ -78,7 +78,7 @@ public class RecommendationEngine {
 		return results;
 	}
 	
-	public ArrayList<Album> GetRecommendations_alg4(Customer cust) {
+	public ArrayList<Album> GetRecommendations_alg7(Customer cust) {
 		//get purchases by cutomer
 		Purchase customerPurchase = db.GetAlbumsPurchasedByCustomer(cust);
 		//get purchase table (everyone except customer)

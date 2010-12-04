@@ -89,7 +89,7 @@ public class main extends HttpServlet {
 		//results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"));
 		//results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
 		//results.AddRecommendationList(engine.GetRecommendations_alg3(user));
-		results.AddRecommendationList(engine.GetRecommendations_alg4(user));
+		results.AddRecommendationList(engine.GetRecommendations_alg7(user));
 
 		//serialize results, and we're done! :)
 		out.println("Hello, World! These are the results :)<br><br>");
