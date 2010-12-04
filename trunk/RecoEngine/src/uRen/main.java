@@ -85,11 +85,11 @@ public class main extends HttpServlet {
 		
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
 		
-		//results.AddRecommendationList(engine.GetRecommendations_alg1(user, "pink floyd"));
-		//results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "artist"));
-		results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
-		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
-		results.AddRecommendationList(engine.GetRecommendations_alg4());
+		//results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"));
+		//results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"));
+		//results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
+		//results.AddRecommendationList(engine.GetRecommendations_alg3(user));
+		results.AddRecommendationList(engine.GetRecommendations_alg4(user));
 
 		//serialize results, and we're done! :)
 		out.println("Hello, World! These are the results :)<br><br>");

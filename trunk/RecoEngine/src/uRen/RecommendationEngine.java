@@ -68,7 +68,7 @@ public class RecommendationEngine {
 	        	maxFreq = (Integer) pairs.getValue();
 	        }
 	    }//finished search
-	    
+	    Logger.Log("Heuristically selected genre = " + genreSelected);
 		return GetRecommendations_alg2a(cust, genreSelected);
 	}
 	
@@ -78,10 +78,42 @@ public class RecommendationEngine {
 		return results;
 	}
 	
-	public ArrayList<Album> GetRecommendations_alg4() {
-		ArrayList<Album> results = new ArrayList<Album>();
-		//results.add(new Album(95, "darkside of the moon4", "pink floyd", "rock", 100));
-		return results;
+	public ArrayList<Album> GetRecommendations_alg4(Customer cust) {
+		//get purchases by cutomer
+		Purchase customerPurchase = db.GetAlbumsPurchasedByCustomer(cust);
+		//get purchase table (everyone except customer)
+		ArrayList<Purchase> recoPool = db.GetAllPurchases(cust.getIdCustomer());
+		//run the algorithm
+		return SimilarityMatcher(customerPurchase, recoPool);
+	}
+	
+	private ArrayList<Album> SimilarityMatcher(Purchase custPurchase, ArrayList<Purchase> purchasePool) {
+		SimilarityIndexer indexer = new SimilarityIndexer(SessionSettings.SimilarUsersToHunt);
+		
+		for(Purchase candidate : purchasePool) {
+			if (candidate == null) continue;
+			int albumSimilarity = 0;
+			int genreSimilarity = 0;
+			int artistSimilarity = 0;
+			Logger.Log(candidate.getCust().getEmailAddress());
+			for (Album custAlbum : custPurchase.getPurchases()) {
+				//check for this album in the candidate's list
+				for (Album candAlbum : candidate.getPurchases()) {
+					if (custAlbum.getID() == candAlbum.getID()) albumSimilarity++;
+					if (custAlbum.getGenre() == candAlbum.getGenre()) genreSimilarity++;
+					if (custAlbum.getArtistName() == candAlbum.getArtistName()) artistSimilarity++;
+				}//end search
+			}//end similarity matching
+			
+			//record albumSimilarity, genreSimilarity, artistSimilarity
+			if (albumSimilarity != 0 ||
+				genreSimilarity != 0 ||
+				artistSimilarity != 0) {
+				indexer.AddCandidatePurchase(candidate, artistSimilarity, genreSimilarity, albumSimilarity);
+			}
+		}
+		
+		return indexer.GetAllAlbumsFromHighestSimilarities();
 	}
 	
 	//now for fun stuff! :)
