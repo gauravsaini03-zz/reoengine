@@ -25,6 +25,10 @@ public class Customer implements Serializable{
 	private String nickName;
 	private String emailAddress;
 	
+	private int weightPopularityGlobal = SessionSettings.DefaultGlobalPopularityWeight;
+	private int weightPopularityPersonal = SessionSettings.DefaultPersonalPopularityWeight;
+	private int weightPopularitySocial = SessionSettings.DefaultSocialPopularityWeight;
+	
 	//constructors
 	public Customer() {
 		idCustomer = -1;
@@ -56,6 +60,27 @@ public class Customer implements Serializable{
 		lastName = cust.getLastName();
 		nickName = cust.getNickName();
 		emailAddress = cust.getEmailAddress();
+	}
+	
+	public void setGlobalPopularityWeight(int weight) {
+		weightPopularityGlobal = weight;
+	}
+	public int getGlobalPopularityWeight() {
+		return weightPopularityGlobal;
+	}
+	
+	public void setSocialPopularityWeight(int weight) {
+		weightPopularitySocial = weight;
+	}
+	public int getSocialPopularityWeight() {
+		return weightPopularitySocial;
+	}
+	
+	public void setPersonalPopularityWeight(int weight) {
+		weightPopularityPersonal = weight;
+	}
+	public int getPersonalPopularityWeight() {
+		return weightPopularityPersonal;
 	}
 
 	public int getIdCustomer() {

@@ -31,13 +31,14 @@ public class Recommendation implements Serializable{
 		}
 	}
 	
-	public void AddRecommendationList(ArrayList<Album> list) {
+	//this is the only function used to add recommendations...
+	public void AddRecommendationList(ArrayList<Album> list, int weight) {
 		for (Album alb : list) {
-			AddRecommendation(alb); //this will ensure, we dont have duplicates!
+			AddRecommendation(alb, weight); //this will ensure, we dont have duplicates!
 		}
 	}
 	
-	public void AddRecommendation(Album alb) {
+	public void AddRecommendation(Album alb, int weight) {
 		
 		//check if he's already bought it...
 		for (Album album : purchased) {
@@ -50,14 +51,22 @@ public class Recommendation implements Serializable{
 		boolean alreadyExists = false;
 		for (Album album : recommendations) {
 			if (album.getID() == alb.getID()) {
+				
+				//if the album already exists, increment its weight
+				int albumWeight = alb.getRecommendationWeight();
+				albumWeight += weight;
+				alb.setRecommendationWeight(albumWeight);
+				
 				alreadyExists = true;
 				break; //stop searching
 			}
 		}
 		
 		if (false == alreadyExists) {
+			Album recommendation = new Album(alb);
+			recommendation.setRecommendationWeight(weight);
 			recommendations.add(
-							new Album(alb) //end new Album
+							recommendation //end new Album
 							); //end add
 		}
 	}

@@ -85,11 +85,19 @@ public class main extends HttpServlet {
 		
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
 		
-		//results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"));
-		//results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"));
-		//results.AddRecommendationList(engine.GetRecommendations_alg2b(user));
-		results.AddRecommendationList(engine.GetRecommendations_alg3(user));
-		//results.AddRecommendationList(engine.GetRecommendations_alg7(user));
+		// the recommendations are of 3 types
+		// 1 - global popularity - this is alg1, alg2 depends on the popularity of artists and genre 
+		// 2 - personal history - this is alg2b, alg7 looks in to the users' history to see what he might like comparing it with others histories
+		// 3 - social popularity - this is the local artist that are playing (alg3) and also the fb thing (alg5/6)
+		
+		//1
+		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"), user.getGlobalPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"), user.getGlobalPopularityWeight());
+		//2
+		results.AddRecommendationList(engine.GetRecommendations_alg2b(user), user.getPersonalPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg7(user), user.getPersonalPopularityWeight());
+		//3
+		results.AddRecommendationList(engine.GetRecommendations_alg3(user), user.getSocialPopularityWeight());
 
 		//serialize results, and we're done! :)
 		out.println("Hello, World! These are the results :)<br><br>");

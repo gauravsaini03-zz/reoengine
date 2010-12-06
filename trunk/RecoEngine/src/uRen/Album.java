@@ -16,12 +16,18 @@ CREATE TABLE Album (
   	price INTEGER UNSIGNED  NULL    ,
 	PRIMARY KEY(idAlbum)); 
 */
-	
+		
 	private int idAlbum;
 	private String albumName;
 	private String artistName;
 	private String genre;
 	private int price;
+	
+	/*
+	 * Recommendation Weights
+	 */
+	private int recommendationWeight;
+	
 	
 	public Album() {
 		idAlbum = -1;
@@ -29,6 +35,8 @@ CREATE TABLE Album (
 		artistName = "";
 		this.genre = "";
 		this.price = -1;
+		
+		recommendationWeight = -1;
 	}
 	
 	public Album(int id, String album, String artist, String genre, int price) {
@@ -37,6 +45,8 @@ CREATE TABLE Album (
 		artistName = artist;
 		this.genre = genre;
 		this.price = price;
+		
+		recommendationWeight = -1;
 	}
 	
 	public Album(Album alb) {
@@ -45,6 +55,8 @@ CREATE TABLE Album (
 		artistName = alb.getArtistName();
 		this.genre = alb.getGenre();
 		this.price = alb.getPrice();
+		
+		recommendationWeight = alb.getRecommendationWeight();
 	}
 	
 	public void Clone(Album alb) {
@@ -53,6 +65,8 @@ CREATE TABLE Album (
 		artistName = alb.getArtistName();
 		this.genre = alb.getGenre();
 		this.price = alb.getPrice();
+		
+		recommendationWeight = alb.getRecommendationWeight();
 	}
 	
 	public int getID() {
@@ -91,6 +105,14 @@ CREATE TABLE Album (
 	}
 	public void setPrice(int price) {
 		this.price = price;
+	}
+
+	public int getRecommendationWeight() {
+		return recommendationWeight;
+	}
+
+	public void setRecommendationWeight(int recommendationWeight) {
+		this.recommendationWeight = recommendationWeight;
 	}
 	
 
