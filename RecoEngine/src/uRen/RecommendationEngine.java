@@ -1,5 +1,8 @@
 package uRen;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,11 +11,14 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 
 
 
 public class RecommendationEngine {
-	
+
 	DatabaseHandler db;
 
 	public RecommendationEngine() {
@@ -30,54 +36,63 @@ public class RecommendationEngine {
 		ArrayList<Purchase> recoPool = db.GetPurchasesByArtist(cust.getIdCustomer(), artist);
 		//get a list of all customers that have purchased an album by "artist" excluding the current customer
 		//in that list of customers, find the largest common subset... [find everything common to all of them!?]
-		
+
 		return DoT3hRecommendationMagic(recoPool);
 		//return list.getPurchases();
 	}
-	
+
 	public ArrayList<Album> GetRecommendations_alg2a(Customer cust, String genre) {
 		ArrayList<Purchase> recoPool = db.GetPurchasesByGenre(cust.getIdCustomer(), genre);
 		return DoT3hRecommendationMagic(recoPool);
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public ArrayList<Album> GetRecommendations_alg2b(Customer cust) {
 		//get the most popular genre for this guy
-		
+
 		HashMap<String, Integer> genreRanks = new HashMap<String, Integer>();
 		Purchase purchases = db.GetAlbumsPurchasedByCustomer(cust);
-		
+
 		for(Album alb : purchases.getPurchases()) {
 			if (genreRanks.containsKey(alb.getGenre())) {
-					Integer frequency = genreRanks.get(alb.getGenre());
-					frequency++;
-					genreRanks.put(alb.getGenre(), frequency);
-				}
-				else {
-					genreRanks.put(alb.getGenre(), new Integer(0));
-				}
+				Integer frequency = genreRanks.get(alb.getGenre());
+				frequency++;
+				genreRanks.put(alb.getGenre(), frequency);
+			}
+			else {
+				genreRanks.put(alb.getGenre(), new Integer(0));
+			}
 		}
 		//genre ranks now contains his genre list... find the highest number!
 		String genreSelected = "";
 		Integer maxFreq=new Integer(-1);
 		Iterator it = genreRanks.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry pairs = (Map.Entry)it.next();
-	        if ( ((Integer)pairs.getValue()) > maxFreq) {
-	        	genreSelected = (String) pairs.getKey();
-	        	maxFreq = (Integer) pairs.getValue();
-	        }
-	    }//finished search
-	    Logger.Log("Heuristically selected genre = " + genreSelected);
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry)it.next();
+			if ( ((Integer)pairs.getValue()) > maxFreq) {
+				genreSelected = (String) pairs.getKey();
+				maxFreq = (Integer) pairs.getValue();
+			}
+		}//finished search
+		Logger.Log("Heuristically selected genre = " + genreSelected);
 		return GetRecommendations_alg2a(cust, genreSelected);
 	}
-	
+
 	public ArrayList<Album> GetRecommendations_alg3(Customer cust) {
 		ArrayList<Album> results = new ArrayList<Album>();
-		//results.add(new Album(96, "darkside of the moon3", "pink floyd", "rock", 100));
+		String [] artist = new String[10];//currently has space for only 10 artists from the API query 
+		artist=GetArtistsFromGigJunkie();	//gets an array of artist names
+
+		for (int i=0;i<artist.length;i++ )
+		{//for each artist get purchased albums by this artist, sorted desc by popularity.
+			ArrayList<Purchase> recoPool = db.GetPurchasesByArtist(cust.getIdCustomer(), artist[i]);
+			//make a common result array for all artists
+			results.addAll(DoT3hRecommendationMagic(recoPool)) ;
+		}
+
 		return results;
 	}
-	
+
 	public ArrayList<Album> GetRecommendations_alg7(Customer cust) {
 		//get purchases by cutomer
 		Purchase customerPurchase = db.GetAlbumsPurchasedByCustomer(cust);
@@ -86,10 +101,10 @@ public class RecommendationEngine {
 		//run the algorithm
 		return SimilarityMatcher(customerPurchase, recoPool);
 	}
-	
+
 	private ArrayList<Album> SimilarityMatcher(Purchase custPurchase, ArrayList<Purchase> purchasePool) {
 		SimilarityIndexer indexer = new SimilarityIndexer(SessionSettings.SimilarUsersToHunt);
-		
+
 		for(Purchase candidate : purchasePool) {
 			if (candidate == null) continue;
 			int albumSimilarity = 0;
@@ -104,39 +119,39 @@ public class RecommendationEngine {
 					if (custAlbum.getArtistName() == candAlbum.getArtistName()) artistSimilarity++;
 				}//end search
 			}//end similarity matching
-			
+
 			//record albumSimilarity, genreSimilarity, artistSimilarity
 			if (albumSimilarity != 0 ||
-				genreSimilarity != 0 ||
-				artistSimilarity != 0) {
+					genreSimilarity != 0 ||
+					artistSimilarity != 0) {
 				indexer.AddCandidatePurchase(candidate, artistSimilarity, genreSimilarity, albumSimilarity);
 			}
 		}
-		
+
 		return indexer.GetAllAlbumsFromHighestSimilarities();
 	}
-	
+
 	//now for fun stuff! :)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private ArrayList<Album> DoT3hRecommendationMagic(ArrayList<Purchase> data) {
 		ArrayList<Album> recommendationPool = new ArrayList<Album>();
-		
+
 		ArrayList<ArrayList<Album>> sourcePool = new ArrayList<ArrayList<Album>>();
 		for (Purchase purchase : data) {
 			if (purchase != null) {
 				sourcePool.add(purchase.getPurchases());
 			}
 		}
-		
+
 		//im gonna try to do this in O(n*m) first, and then see where i can improve... later
 		//for class projects -> [first]make it work. [second]make it elegant. [third]make it fast.
-		
+
 		//i have 2 strategies in mind...
 		//first is more efficient but may not be as accurate in its recommendations
 		//second is inefficient but its recommendations will be more accurate
 		//im implementing both, and commenting out the inefficient one.
 		//maybe i can do some runtime switching based on some logic ? i dono... first [quick] one for now
-		
+
 		HashMap<Integer, Integer> ranks = new HashMap<Integer, Integer>(); //STUPID java does not support a hashmap with primitives!!!
 
 		/*
@@ -159,7 +174,7 @@ public class RecommendationEngine {
 				}
 			} //end for each album
 		} //end for each list
-		
+
 		/*
 		 * 
 		 * STRATEGY 2: rank only the common albums according to popularity
@@ -192,11 +207,11 @@ public class RecommendationEngine {
 				} // end for inner
 			} // end for each album in outer list
 		} // end for outer
-		*/
-		
+		 */
+
 		//at this point 'ranks' has all the information i need... i just need to pick the highest [or lowest ;)] X ranks,
 		//and that, ladies and gentlemen, is THE recommendation pool! :D
-		System.out.println("hh");
+		Logger.Log("hh");
 		//sort the hashmap based on values
 		ArrayList sortedArrayList = new ArrayList( ranks.entrySet() );  
 
@@ -219,45 +234,89 @@ public class RecommendationEngine {
 			Map.Entry entry = (Map.Entry)i.next();
 			sortedRanks.put((Integer)entry.getKey(), (Integer)entry.getValue());
 		}
-		
+
 		//now just search for the best ranked chaps and return them :)
 		int forgiveness = SessionSettings.SonnyCorleone; 
 		int oldFreq = -1;
 		for(Integer key : sortedRanks.keySet()) {
-			
+
 			Album album = db.GetAlbumByID(key.intValue());
 			int freq = sortedRanks.get(key).intValue();
-			
+
 			if (freq != oldFreq) {
 				oldFreq = freq;
 				forgiveness--;
 				if (forgiveness < 0) break; //im done with recommendations
 			}
-			
+
 			Logger.Log( album.getArtistName() + ", " +
-						album.getAlbumName() + " - "+ freq);
-			
+					album.getAlbumName() + " - "+ freq);
+
 			recommendationPool.add(album);
 		}//end for
-		
+
 		return recommendationPool;
+	}
+
+	private String[] GetArtistsFromGigJunkie(){
+		String head_artist[]= new String[SessionSettings.MaxGigjunkieResults];
+		try 
+		{
+			URL url_str = new URL (SessionSettings.GigjukieURL);		
+			//http://api.bandsintown.com/events/search.json?location=Atlanta,GA&radius=1&date=2010-11-23,2010-11-23&app_id=shwetapatira_gatech"
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(url_str.openStream()));
+			//http://api.bandsintown.com/events/search.json?location=Atlanta,GA&radius=1&date=2010-11-23,2010-11-23&app_id=shwetapatira_gatech
+
+			String str;
+			StringBuilder builder = new StringBuilder();
+
+			while((str = in.readLine())!=null)
+				builder.append(str);
+
+			Logger.Log("The size of the buffer is " + builder.length() );
+			String result = builder.toString();
+			Logger.Log("This is the result" + result );
+			result = result.substring(result.indexOf('[',0));
+
+			JSONArray my_res = new JSONArray(result);
+
+			Logger.Log("The size of the array is " + my_res.length() );
+
+
+			for(int i=0; i<my_res.length(); i++)
+			{
+				JSONObject entry = my_res.getJSONObject(i); 
+				// String str_part = my_res.getString(i);
+				head_artist[i]= entry.getJSONObject("Artists").getJSONArray("Artists").getJSONObject(0).getString("Name");
+				//       int resultCount = json.getJSONObject("").getJSONObject("cursor").getInt("estimatedResu
+				//  ltCount");
+				Logger.Log("This is each element of the array" + head_artist);
+			}
+			in.close();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return head_artist;	
 	}
 
 
 	public Purchase GetPurchasesByCustomer(Customer cust) {
 		return db.GetAlbumsPurchasedByCustomer(cust);
 	}
-	
+
 	public void TestDBInsertUser(String fname, String lname, String nname, String email) {
 		db.InsertIntoCustomerTable(fname, lname, nname, email);
 	}
-	
+
 	public Customer GetCustomerByEmailAddress(String email) {
 		return db.GetCustomerByEmailAddress(email);
 	}
-	
+
 	public Customer GetCustomerByID(int id) {
 		return db.GetCustomerByID(id);
 	}
-	
+
 }

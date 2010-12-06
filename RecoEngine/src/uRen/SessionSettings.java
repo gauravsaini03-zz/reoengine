@@ -43,5 +43,10 @@ public abstract class SessionSettings {
   	public static String Purchase_Join_artistName = "artistName";
   	public static String Purchase_Join_genre = "genre";
   	public static String Purchase_Join_price = "price";
-	
+  	
+  	/*
+  	 * GIGJUNKIE API CONSTANTS
+  	 */
+  	public static String GigjukieURL = "http://api.gigjunkie.net/v1.0/events?q=Atlanta&startDate=2010-11-27&endDate=2010-12-27&distance=20&consumerKey=00fc5a4e-94c1-4c57-b510-49651c68258b&format=JSON";
+  	public static int MaxGigjunkieResults = 10;
 }
