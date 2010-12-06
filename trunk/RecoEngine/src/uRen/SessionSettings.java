@@ -3,10 +3,6 @@ package uRen;
 public abstract class SessionSettings {
 	public static String ConnectorString = "com.mysql.jdbc.Driver";
 	public static String ServerUrl = "jdbc:mysql://localhost:3306/";
-//	public static String Database = "tempDB";
-//	public static String Username = "aero9";
-//	public static String Password = "password";
-	
 	public static String Database = "uRen";
 	public static String Username = "dbAccessor";
 	public static String Password = "dbpasswd";
@@ -56,4 +52,9 @@ public abstract class SessionSettings {
   	public static int DefaultGlobalPopularityWeight = 5;
   	public static int DefaultSocialPopularityWeight = 2;
   	public static int DefaultPersonalPopularityWeight = 3;
+  	
+  	/*
+  	 * Debug Consts
+  	 */
+  	public static boolean DumpDebugData = true;
 }
