@@ -49,4 +49,11 @@ public abstract class SessionSettings {
   	 */
   	public static String GigjukieURL = "http://api.gigjunkie.net/v1.0/events?q=Atlanta&startDate=2010-11-27&endDate=2010-12-27&distance=20&consumerKey=00fc5a4e-94c1-4c57-b510-49651c68258b&format=JSON";
   	public static int MaxGigjunkieResults = 10;
+  	
+  	/*
+  	 * Popularity Weights
+  	 */
+  	public static int DefaultGlobalPopularityWeight = 5;
+  	public static int DefaultSocialPopularityWeight = 2;
+  	public static int DefaultPersonalPopularityWeight = 3;
 }
