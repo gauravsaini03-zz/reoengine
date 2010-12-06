@@ -85,22 +85,83 @@ public class main extends HttpServlet {
 		
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
 		
+		//Perf Timers
+		PerfTimer totalTurnaroundTime = new PerfTimer();
+		//combined Perf Timers
+		PerfTimer globalPopPerfTimer = new PerfTimer();
+		PerfTimer socialPopPerfTimer = new PerfTimer();
+		PerfTimer personalPopPerfTimer = new PerfTimer();
+		//Individual Perf Timers
+		PerfTimer alg1PerfTimer = new PerfTimer();
+		PerfTimer alg2aPerfTimer = new PerfTimer();
+		PerfTimer alg2bPerfTimer = new PerfTimer();
+		PerfTimer alg7PerfTimer = new PerfTimer();
+		PerfTimer alg3PerfTimer = new PerfTimer();
+		
 		// the recommendations are of 3 types
 		// 1 - global popularity - this is alg1, alg2 depends on the popularity of artists and genre 
 		// 2 - personal history - this is alg2b, alg7 looks in to the users' history to see what he might like comparing it with others histories
 		// 3 - social popularity - this is the local artist that are playing (alg3) and also the fb thing (alg5/6)
 		
-		//1
+		//start thetotal turnaround timer
+		totalTurnaroundTime.Start();
+		/*
+		 * 1 - Global Popularity
+		 */
+		globalPopPerfTimer.Start();
+		
+		alg1PerfTimer.Start();
 		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"), user.getGlobalPopularityWeight());
+		alg1PerfTimer.Stop();
+		
+		alg2aPerfTimer.Start();
 		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"), user.getGlobalPopularityWeight());
-		//2
+		alg2aPerfTimer.Stop();
+		
+		globalPopPerfTimer.Stop();
+		
+		/*
+		 * 2 - Personal Popularity
+		 */
+		personalPopPerfTimer.Start();
+		
+		alg2bPerfTimer.Start();
 		results.AddRecommendationList(engine.GetRecommendations_alg2b(user), user.getPersonalPopularityWeight());
+		alg2bPerfTimer.Stop();
+		
+		alg7PerfTimer.Start();
 		results.AddRecommendationList(engine.GetRecommendations_alg7(user), user.getPersonalPopularityWeight());
-		//3
+		alg7PerfTimer.Stop();
+		
+		personalPopPerfTimer.Stop();
+		
+		/*
+		 * 3 - Social Popularity
+		 */
+		socialPopPerfTimer.Start();
+		
+		alg3PerfTimer.Start();
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user), user.getSocialPopularityWeight());
-
+		alg3PerfTimer.Stop();
+		
+		socialPopPerfTimer.Stop();
+		
+		//stop the total turnaround timer
+		totalTurnaroundTime.Stop();
+		
 		//serialize results, and we're done! :)
 		out.println("Hello, World! These are the results :)<br><br>");
+		if (SessionSettings.DumpDebugData) {
+			out.println( "totalTurnaroundTime = " + totalTurnaroundTime.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "globalPopPerfTimer = " + globalPopPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "socialPopPerfTimer = " + socialPopPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "personalPopPerfTimer = " + personalPopPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg1PerfTimer = " + alg1PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg2aPerfTimer = " + alg2aPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg2bPerfTimer = " + alg2bPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg7PerfTimer = " + alg7PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg3PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+		}
 		out.println("<pre>");
 		
 		String output = serializerXML.Serialize(results, "c:\\temp\\out.xml");
