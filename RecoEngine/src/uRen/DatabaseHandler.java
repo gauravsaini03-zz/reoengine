@@ -353,6 +353,27 @@ public class DatabaseHandler {
 		return matchFound == true ? alb : null; 
 	}
 	
+	public ArrayList<Album> GetAlbumsByArtist(String artistName) {
+		ArrayList<Album> results = new ArrayList<Album>();
+		
+		if (false == albumCacheValid) {
+			ForceAlbumCacheUpdate(); //force read of album table
+		}
+		
+		//todo: linear search for now... but we should probably make this binary, very easy to do...
+		for (Album album : albumCache) {
+			if ( artistName == album.getArtistName()) {
+				Album alb = new Album();
+				//found a match!
+				alb.Clone(album);
+				results.add(alb);
+				break; //stop searching
+			}
+		}
+		
+		return results; 
+	}
+	
 	public Album GetAlbumByID(int id) {
 		if (false == albumCacheValid) {
 			ForceAlbumCacheUpdate(); //force read of album table
