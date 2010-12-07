@@ -97,13 +97,14 @@ public class main extends HttpServlet {
 		PerfTimer alg2bPerfTimer = new PerfTimer();
 		PerfTimer alg7PerfTimer = new PerfTimer();
 		PerfTimer alg3PerfTimer = new PerfTimer();
+		PerfTimer alg5PerfTimer = new PerfTimer();
 		
 		// the recommendations are of 3 types
 		// 1 - global popularity - this is alg1, alg2 depends on the popularity of artists and genre 
 		// 2 - personal history - this is alg2b, alg7 looks in to the users' history to see what he might like comparing it with others histories
 		// 3 - social popularity - this is the local artist that are playing (alg3) and also the fb thing (alg5/6)
 		
-		//start thetotal turnaround timer
+		//start the total turnaround timer
 		totalTurnaroundTime.Start();
 		/*
 		 * 1 - Global Popularity
@@ -144,13 +145,17 @@ public class main extends HttpServlet {
 		results.AddRecommendationList(engine.GetRecommendations_alg3(user), user.getSocialPopularityWeight());
 		alg3PerfTimer.Stop();
 		
+		alg5PerfTimer.Start();
+		results.AddRecommendationList(engine.GetRecommendations_alg5(user), user.getSocialPopularityWeight());
+		alg5PerfTimer.Stop();
+		
 		socialPopPerfTimer.Stop();
 		
 		//stop the total turnaround timer
 		totalTurnaroundTime.Stop();
 		
 		//serialize results, and we're done! :)
-		out.println("Hello, World! These are the results :)<br><br>");
+		//out.println("Hello, World! These are the results :)<br><br>");
 		if (SessionSettings.DumpDebugData) {
 			out.println( "totalTurnaroundTime = " + totalTurnaroundTime.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "globalPopPerfTimer = " + globalPopPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
@@ -160,6 +165,7 @@ public class main extends HttpServlet {
 			out.println( "alg2aPerfTimer = " + alg2aPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg2bPerfTimer = " + alg2bPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg7PerfTimer = " + alg7PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg5PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg3PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 		}
 		out.println("<pre>");
@@ -171,6 +177,8 @@ public class main extends HttpServlet {
 		out.println(output);
 		
 		out.println("</pre>");
+		
+		out.println("<title> hello world! </title>"); 
 
 	}
 

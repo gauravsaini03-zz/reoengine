@@ -6,13 +6,24 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import com.restfb.Connection;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.FacebookException;
+import com.restfb.FacebookJsonMappingException;
+import com.restfb.types.CategorizedFacebookType;
+import com.restfb.types.User;
 
 
 
@@ -91,6 +102,19 @@ public class RecommendationEngine {
 		}
 
 		return results;
+	}
+
+	public ArrayList<Album> GetRecommendations_alg5(Customer cust) {
+		//ArrayList<Album> results = new ArrayList<Album>();
+		//results.add(new Album(99, "darkside of the moon", "pink floyd", "rock", 100));
+
+		String Artist = fbinterests();
+		ArrayList<Album> results = new ArrayList<Album>();
+
+		results = db.GetAlbumsByArtist(Artist);	//gets an array of albumnames
+
+		return results;
+
 	}
 
 	public ArrayList<Album> GetRecommendations_alg7(Customer cust) {
@@ -300,6 +324,142 @@ public class RecommendationEngine {
 		}
 
 		return head_artist;	
+	}
+
+
+
+	public String fbinterests()
+	{
+		String [] artist = new String[10];
+		FacebookClient facebookClient = new DefaultFacebookClient("2227470867|2.l7Sgb2w2iINoTe2nsRhjKw__.3600.1291741200-100000236469693|W_AITXkBId4qj64ecp6z3r1C6fE");        
+		FacebookClient[] facebookClientlist = new DefaultFacebookClient[10] ;
+		User user;int idx=0;
+
+		/*
+			//try getting access tokens dynamically
+
+			try {
+				URL url = new URL("https://graph.facebook.com/oauth/access_token?grant_type=authorization_code&client_id=162830627092777&client_secret=5851e94067fd91e54bc1667ff794f6dc");
+
+			} catch (MalformedURLException e1) {
+				e1.printStackTrace();
+			}
+		 */
+		try {
+			//Connection<Post> myFeed = facebookClient.fetchConnection("me/feed", Post.class);
+			Connection<User> myFriends = facebookClient.fetchConnection("me/friends", User.class);
+			Connection <CategorizedFacebookType> myMusic = facebookClient.fetchConnection("me/music", CategorizedFacebookType.class);
+
+			//get my music interests from fb
+			for (int i =0; i < myMusic.getData().size(); i++)
+			{	
+				String Category = myMusic.getData().get(i).getCategory();
+				String Name = myMusic.getData().get(i).getName();
+				System.out.println("My category!!!"+Category+"  Name:"+Name);
+
+				if (Category == "Musicians")//take only musicians not Genre n other such stuff
+					artist[i] = Name;
+			}
+
+			String query = "SELECT uid, name FROM user WHERE uid=661520015";// or uid=661520015 //Get only vivek & gaurav 
+			List<QueryResult> friends = facebookClient.executeQuery(query, QueryResult.class);
+			System.out.println("Users: " + friends);
+
+			Hashtable<String, Integer> pop_table = new Hashtable<String, Integer>();
+			int i, length;
+
+			for (QueryResult entry: friends)
+			{	
+				entry.idx=idx++;
+				if 
+				(entry.uid.equals("661520015"))	
+					entry.access_token ="2227470867|2.HWXuDPljhndE_7GHIOUIAA__.3600.1291741200-661520015|KeGE6sKDfigo5Gq-QcTE6XoTNQw" ;
+
+				/*  if (entry.uid.equals("516264396"))
+
+				 *other friends .. this is very lame :P
+
+				 */
+				//use his access token to make a music query.
+				facebookClientlist [entry.idx] = new DefaultFacebookClient(entry.access_token);
+				String conn_str = entry.uid.concat("/music");
+				Connection <CategorizedFacebookType> FMusic = facebookClientlist[entry.idx].fetchConnection(conn_str, CategorizedFacebookType.class);
+				int count_artists=0;
+
+				for (int f =0; f < FMusic.getData().size(); f++)
+				{	
+					String Category = FMusic.getData().get(f).getCategory();
+					String Name = FMusic.getData().get(f).getName();
+					System.out.println("My category!!!"+Category+"  Name:"+Name);
+
+					if (Category.equalsIgnoreCase("Musicians"))// only get musicians.. No need for music-genres right now
+					{
+						count_artists++;
+						entry.Artists[f] = Name;
+						System.out.println("Artists:"+entry.Artists[f]);
+					}
+				}
+
+				System.out.println("Length of array"+entry.Artists.length);
+
+				for (int f=0; f< count_artists;f++)			//need a new loop coz we only want "Musicians" (gone into artists)
+				{
+					String hkey = entry.Artists[f];
+					System.out.println("This is the value"+hkey);
+					//Integer artist_cnt_hash = null;
+					if (hkey == null) continue;
+					if (pop_table.containsKey(hkey) == true) {
+						Integer count = (Integer)pop_table.get(hkey);
+						pop_table.put(hkey, new Integer (count.intValue()+1)); System.out.println("Putting count in key"+hkey);
+					} else {
+						System.out.println("Putting 1 in the key"+hkey);
+						pop_table.put(hkey, new Integer(1));
+					}
+					/*
+					artist_cnt_hash = (Integer)pop_table.get(hkey);
+
+					if (artist_cnt_hash  == null)					//if artist not found, add one
+					{System.out.println("Putting 1 in the key"+hkey);
+					pop_table.put(hkey, new Integer(1)); }
+					else 									//if found increment the value
+					{pop_table.put(hkey, new Integer (artist_cnt_hash.intValue()+1)); System.out.println("Putting count in key"+hkey);}
+					*/
+				}//for artists array
+			}//for each friend
+
+			Enumeration keys = pop_table.keys();
+
+			int max = 0;
+			String bestArtist = new String();
+			while (keys.hasMoreElements()) 
+			{
+				Object key = keys.nextElement();
+				Integer count =(Integer) pop_table.get(key);
+				if (count > max)
+				{  max = count; 
+				bestArtist = (String) key;
+				}
+				System.out.println(" Best until now :" + bestArtist + " count: "+count  );
+			}
+
+			System.out.println("Most popular artist is:"+bestArtist);
+
+
+			//for (each friend) {for users}
+
+			return (String)bestArtist;
+
+			//..every user has an artists list now. stored in friends[].Artists
+
+		} catch (FacebookJsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FacebookException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+
 	}
 
 
