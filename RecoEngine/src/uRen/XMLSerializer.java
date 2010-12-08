@@ -18,6 +18,7 @@ public class XMLSerializer {
 		xenc.writeObject(obj);
 		xenc.flush();
 		String xmlOut = bos.toString();
+		xmlOut += xmlOut + "</java>";
 		Logger.Log(xmlOut);
 		
 		if ( fileName != "" && fileName.length() > 0) {

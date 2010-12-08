@@ -102,6 +102,10 @@ public class main extends HttpServlet {
 		//if add in mode, get done, QUICK!
 		if (albumIDPresent) {
 			Album album = engine.GetAlbumByID(albumID);
+			if (album == null) {
+				Logger.Log("invalid album");
+				return;
+			}
 			engine.InsertIntoPurchaseTable(user, album);
 			return;
 		}
@@ -137,7 +141,7 @@ public class main extends HttpServlet {
 		 * 2a - Based on current selection, using genre
 		 * 2b - Based on user history, find popular genre
 		 * 3  - Based on gigjunkie concerts in town
-		 * 4 - Using similarity index between this user and remaining uers in the system
+		 * 4  - Using similarity index between this user and remaining users in the system
 		 * 5  - Based on Facebook friends
 		 * 6* - <snipped>
 		 */
