@@ -3,6 +3,7 @@ package uRen;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -48,40 +49,65 @@ public class main extends HttpServlet {
 		//Album			: we're gonna use alg1, alg2a, alg3, alg4
 		//!Album		: we're gonna use alg2b, alg3, alg4
 		
-		
 		/*
-		response.setContentType("text/html");	
-		PrintWriter out = response.getWriter();
-		out.println("<BODY>\n" +
-				"<H1 ALIGN=CENTER>" + "Params" + "</H1>\n"+
-		"<table><TH>Parameter Name<TH>Parameter Value(s)");
+		 * im looking out for 4 modes of working here...
+		 * 1. recommend based on username - 2b, 4, 3, 5 are used in this case ('BASIC_MODE')
+		 * 2a. recommend based on username, artist - add 1 to the previous list ('ARTIST_MODE')
+		 * 2b. recommend based on username, genre - add 2a to the first list ('GENRE_MODE')
+		 * 3. adding mode, username, albumid ('ADDIN_MODE')
+		 */
+		boolean userNamePresent = false;
+		String userName = "null";
+		boolean artistPresent = false;
+		String artist = "null";
+		boolean genrePresent = false;
+		String genre = "null";
+		boolean albumIDPresent = false;
+		int albumID = 0;
+		
 		Enumeration paramNames = request.getParameterNames();
 		while(paramNames.hasMoreElements()) {
 			String paramName = (String)paramNames.nextElement();
-			out.println("<TR><TD>" + paramName + "\n<TD>");
 			String[] paramValues = request.getParameterValues(paramName);
-			if (paramValues.length == 1) {
-				String paramValue = paramValues[0];
-				if (paramValue.length() == 0)
-					out.print("<I>No Value</I>");
-				else
-					out.print(paramValue);
-			} else {
-				out.println("<UL>");
-				for(int i=0; i<paramValues.length; i++) {
-					out.println("<LI>" + paramValues[i]);
+			
+			if (paramValues.length <= 0) continue; //skip it as it has no value
+			
+			if (paramName.compareToIgnoreCase(SessionSettings.ParamUserame) == 0 ) {
+				userNamePresent = true;
+				userName = paramValues[0];
+			} else if (paramName.compareToIgnoreCase(SessionSettings.ParamArtist) == 0 ) {
+				artistPresent = true;
+				artist = paramValues[0];
+			} else if (paramName.compareToIgnoreCase(SessionSettings.ParamGenre) == 0 ) {
+				genrePresent = true;
+				genre = paramValues[0];
+			} else if (paramName.compareToIgnoreCase(SessionSettings.ParamAlbumID) == 0 ) {
+				albumIDPresent = true;
+				try {
+					albumID = Integer.parseInt(paramValues[0].trim());
+				} catch (Exception ex) {
+					albumIDPresent = false;
 				}
-				out.println("</UL>");
+			} else {
+				//ignore it
 			}
 		}
-		out.println("</TABLE>\n</BODY></HTML>");
-		*/
-
-		String email = "aero9@gmail.com";
+		
+		//figure out the mode
+		if (!userNamePresent) return; //fatal error!
+		String email = userName; //"aero9@gmail.com";
 		Customer user = engine.GetCustomerByEmailAddress(email);
 		if (user == null) Logger.Log("IS mySQL RUNNING??");
-		Purchase userPurchases = engine.GetPurchasesByCustomer(user);
 		
+		//if add in mode, get done, QUICK!
+		if (albumIDPresent) {
+			Album album = engine.GetAlbumByID(albumID);
+			engine.InsertIntoPurchaseTable(user, album);
+			return;
+		}
+
+		Purchase userPurchases = engine.GetPurchasesByCustomer(user);
+
 		Recommendation results = new Recommendation(user);
 		
 		results.AddAlbumsPurchased(userPurchases.getPurchases());
@@ -123,13 +149,16 @@ public class main extends HttpServlet {
 		 */
 		globalPopPerfTimer.Start();
 		
-		alg1PerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"), user.getGlobalPopularityWeight(), "alg1");
-		alg1PerfTimer.Stop();
-		
-		alg2aPerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"), user.getGlobalPopularityWeight(), "alg2a");
-		alg2aPerfTimer.Stop();
+		if (artistPresent) {
+			alg1PerfTimer.Start();
+			results.AddRecommendationList(engine.GetRecommendations_alg1(user, artist), user.getGlobalPopularityWeight(), "alg1");
+			alg1PerfTimer.Stop();
+		}		
+		if (genrePresent) {
+			alg2aPerfTimer.Start();
+			results.AddRecommendationList(engine.GetRecommendations_alg2a(user, genre), user.getGlobalPopularityWeight(), "alg2a");
+			alg2aPerfTimer.Stop();
+		}
 		
 		globalPopPerfTimer.Stop();
 		
