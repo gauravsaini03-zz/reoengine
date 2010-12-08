@@ -322,7 +322,7 @@ public class DatabaseHandler {
 		boolean matchFound = false;
 		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Album album : albumCache) {
-			if ( artistName == album.getArtistName() && albumName == album.getAlbumName() ) {
+			if ( artistName.compareToIgnoreCase(album.getArtistName()) == 0 && albumName.compareToIgnoreCase(album.getAlbumName()) ==0 ) {
 				//found a match!
 				matchFound = true;
 				alb.Clone(album);
@@ -342,7 +342,7 @@ public class DatabaseHandler {
 		boolean matchFound = false;
 		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Album album : albumCache) {
-			if ( artistName == album.getArtistName()) {
+			if ( artistName.compareToIgnoreCase(album.getArtistName()) == 0) {
 				//found a match!
 				matchFound = true;
 				alb.Clone(album);
@@ -354,6 +354,7 @@ public class DatabaseHandler {
 	}
 	
 	public ArrayList<Album> GetAlbumsByArtist(String artistName) {
+		if (artistName == null) return null;
 		ArrayList<Album> results = new ArrayList<Album>();
 		
 		if (false == albumCacheValid) {
@@ -362,7 +363,7 @@ public class DatabaseHandler {
 		
 		//todo: linear search for now... but we should probably make this binary, very easy to do...
 		for (Album album : albumCache) {
-			if ( artistName == album.getArtistName()) {
+			if ( artistName.compareToIgnoreCase(album.getArtistName())==0 ) {
 				Album alb = new Album();
 				//found a match!
 				alb.Clone(album);

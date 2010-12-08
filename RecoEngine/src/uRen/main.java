@@ -79,6 +79,7 @@ public class main extends HttpServlet {
 
 		String email = "aero9@gmail.com";
 		Customer user = engine.GetCustomerByEmailAddress(email);
+		if (user == null) Logger.Log("IS mySQL RUNNING??");
 		Purchase userPurchases = engine.GetPurchasesByCustomer(user);
 		
 		Recommendation results = new Recommendation(user);
@@ -95,7 +96,7 @@ public class main extends HttpServlet {
 		PerfTimer alg1PerfTimer = new PerfTimer();
 		PerfTimer alg2aPerfTimer = new PerfTimer();
 		PerfTimer alg2bPerfTimer = new PerfTimer();
-		PerfTimer alg7PerfTimer = new PerfTimer();
+		PerfTimer alg4PerfTimer = new PerfTimer();
 		PerfTimer alg3PerfTimer = new PerfTimer();
 		PerfTimer alg5PerfTimer = new PerfTimer();
 		
@@ -103,6 +104,17 @@ public class main extends HttpServlet {
 		// 1 - global popularity - this is alg1, alg2 depends on the popularity of artists and genre 
 		// 2 - personal history - this is alg2b, alg7 looks in to the users' history to see what he might like comparing it with others histories
 		// 3 - social popularity - this is the local artist that are playing (alg3) and also the fb thing (alg5/6)
+		
+		/*
+		 * REVISED:
+		 * 1  - Based on current selection, using artist
+		 * 2a - Based on current selection, using genre
+		 * 2b - Based on user history, find popular genre
+		 * 3  - Based on gigjunkie concerts in town
+		 * 4 - Using similarity index between this user and remaining uers in the system
+		 * 5  - Based on Facebook friends
+		 * 6* - <snipped>
+		 */
 		
 		//start the total turnaround timer
 		totalTurnaroundTime.Start();
@@ -112,11 +124,11 @@ public class main extends HttpServlet {
 		globalPopPerfTimer.Start();
 		
 		alg1PerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"), user.getGlobalPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg1(user, "Metallica"), user.getGlobalPopularityWeight(), "alg1");
 		alg1PerfTimer.Stop();
 		
 		alg2aPerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"), user.getGlobalPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg2a(user, "Rock"), user.getGlobalPopularityWeight(), "alg2a");
 		alg2aPerfTimer.Stop();
 		
 		globalPopPerfTimer.Stop();
@@ -127,12 +139,12 @@ public class main extends HttpServlet {
 		personalPopPerfTimer.Start();
 		
 		alg2bPerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg2b(user), user.getPersonalPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg2b(user), user.getPersonalPopularityWeight(), "alg2b");
 		alg2bPerfTimer.Stop();
 		
-		alg7PerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg7(user), user.getPersonalPopularityWeight());
-		alg7PerfTimer.Stop();
+		alg4PerfTimer.Start();
+		results.AddRecommendationList(engine.GetRecommendations_alg4(user), user.getPersonalPopularityWeight(), "alg4");
+		alg4PerfTimer.Stop();
 		
 		personalPopPerfTimer.Stop();
 		
@@ -142,11 +154,11 @@ public class main extends HttpServlet {
 		socialPopPerfTimer.Start();
 		
 		alg3PerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg3(user), user.getSocialPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg3(user), user.getSocialPopularityWeight(), "alg3");
 		alg3PerfTimer.Stop();
 		
 		alg5PerfTimer.Start();
-		results.AddRecommendationList(engine.GetRecommendations_alg5(user), user.getSocialPopularityWeight());
+		results.AddRecommendationList(engine.GetRecommendations_alg5(user), user.getSocialPopularityWeight(), "alg5");
 		alg5PerfTimer.Stop();
 		
 		socialPopPerfTimer.Stop();
@@ -164,8 +176,8 @@ public class main extends HttpServlet {
 			out.println( "alg1PerfTimer = " + alg1PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg2aPerfTimer = " + alg2aPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg2bPerfTimer = " + alg2bPerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
-			out.println( "alg7PerfTimer = " + alg7PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
-			out.println( "alg5PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg4PerfTimer = " + alg4PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
+			out.println( "alg5PerfTimer = " + alg5PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg3PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 		}
 		out.println("<pre>");
