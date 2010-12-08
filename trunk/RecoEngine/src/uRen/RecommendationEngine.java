@@ -97,6 +97,7 @@ public class RecommendationEngine {
 		for (int i=0;i<artist.length;i++ )
 		{//for each artist get purchased albums by this artist, sorted desc by popularity.
 			ArrayList<Purchase> recoPool = db.GetPurchasesByArtist(cust.getIdCustomer(), artist[i]);
+			//results.addAll(db.GetAlbumsByArtist(artist[i]));
 			//make a common result array for all artists
 			results.addAll(DoT3hRecommendationMagic(recoPool)) ;
 		}
@@ -109,6 +110,11 @@ public class RecommendationEngine {
 		//results.add(new Album(99, "darkside of the moon", "pink floyd", "rock", 100));
 
 		String Artist = fbinterests();
+		if (Artist == null) {
+			Logger.Log("FACEBOOK ALGO NOT WORKING!!!");
+			return null;
+		}
+		
 		ArrayList<Album> results = new ArrayList<Album>();
 
 		results = db.GetAlbumsByArtist(Artist);	//gets an array of albumnames
@@ -117,7 +123,7 @@ public class RecommendationEngine {
 
 	}
 
-	public ArrayList<Album> GetRecommendations_alg7(Customer cust) {
+	public ArrayList<Album> GetRecommendations_alg4(Customer cust) {
 		//get purchases by cutomer
 		Purchase customerPurchase = db.GetAlbumsPurchasedByCustomer(cust);
 		//get purchase table (everyone except customer)
@@ -138,9 +144,9 @@ public class RecommendationEngine {
 			for (Album custAlbum : custPurchase.getPurchases()) {
 				//check for this album in the candidate's list
 				for (Album candAlbum : candidate.getPurchases()) {
-					if (custAlbum.getID() == candAlbum.getID()) albumSimilarity++;
-					if (custAlbum.getGenre() == candAlbum.getGenre()) genreSimilarity++;
-					if (custAlbum.getArtistName() == candAlbum.getArtistName()) artistSimilarity++;
+					if (custAlbum.getID() == candAlbum.getID() ) albumSimilarity++;
+					if (custAlbum.getGenre().compareToIgnoreCase(candAlbum.getGenre())==0 ) genreSimilarity++;
+					if (custAlbum.getArtistName().compareToIgnoreCase(candAlbum.getArtistName())==0 ) artistSimilarity++;
 				}//end search
 			}//end similarity matching
 

@@ -33,6 +33,26 @@ public class Recommendation implements Serializable{
 	
 	//this is the only function used to add recommendations...
 	public void AddRecommendationList(ArrayList<Album> list, int weight) {
+		AddRecommendationList(list, weight, "null");
+	}
+	public void AddRecommendationList(ArrayList<Album> list, int weight, String algoName) {
+		if (list == null) return;
+		/*
+		 * evaluation mode
+		 */
+		if (SessionSettings.EvaluationMode) {
+			int artistMetric=0;
+			int genreMetric=0;
+			Logger.LogEvalResults("Evaluation Mode... " + algoName + " count = " + list.size());
+			for (Album recoAlbum : list) {
+				for (Album purAlbum : purchased) {
+					if (recoAlbum.getArtistName().compareToIgnoreCase(purAlbum.getArtistName())==0 ) artistMetric++;
+					if (recoAlbum.getGenre().compareToIgnoreCase(purAlbum.getGenre())==0 ) genreMetric++;
+				}
+			}
+			Logger.LogEvalResults("For " + algoName + " ArtistMetric = " + artistMetric + " GenreMetric = " + genreMetric);
+		}
+		
 		for (Album alb : list) {
 			AddRecommendation(alb, weight); //this will ensure, we dont have duplicates!
 		}

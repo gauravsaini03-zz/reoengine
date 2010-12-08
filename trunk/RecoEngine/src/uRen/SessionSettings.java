@@ -57,4 +57,6 @@ public abstract class SessionSettings {
   	 * Debug Consts
   	 */
   	public static boolean DumpDebugData = true;
+  	public static boolean EvaluationMode = true;
+  	public static String EvalResultsFile = "c:\\temp\\evalResults.txt";
 }
