@@ -272,7 +272,6 @@ public class DatabaseHandler {
 		return albumCache;
 	}
 	
-	
 	public Customer GetCustomerByEmailAddress(String emailAddress) {
 		if (false == customerCacheValid) {
 			ForceCustomerCacheUpdate(); //force read of customer table

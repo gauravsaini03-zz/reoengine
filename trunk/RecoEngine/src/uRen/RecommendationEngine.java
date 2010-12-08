@@ -472,6 +472,15 @@ public class RecommendationEngine {
 	public Purchase GetPurchasesByCustomer(Customer cust) {
 		return db.GetAlbumsPurchasedByCustomer(cust);
 	}
+	
+	public Album GetAlbumByID(int id) {
+		return db.GetAlbumByID(id);
+	}
+	
+	public boolean InsertIntoPurchaseTable(Customer cust, Album alb) {
+		int resultRows = db.InserIntoPurchaseTable(alb.getID(), cust.getIdCustomer());
+		return resultRows == -1 ? false: true;
+	}
 
 	public void TestDBInsertUser(String fname, String lname, String nname, String email) {
 		db.InsertIntoCustomerTable(fname, lname, nname, email);

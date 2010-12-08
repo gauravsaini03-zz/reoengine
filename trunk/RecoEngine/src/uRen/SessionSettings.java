@@ -59,4 +59,12 @@ public abstract class SessionSettings {
   	public static boolean DumpDebugData = true;
   	public static boolean EvaluationMode = true;
   	public static String EvalResultsFile = "c:\\temp\\evalResults.txt";
+  	
+  	/*
+  	 * Param Names
+  	 */
+  	public static String ParamUserame = "username";
+  	public static String ParamGenre = "genre";
+  	public static String ParamArtist = "artist";
+  	public static String ParamAlbumID = "albumid";
 }
