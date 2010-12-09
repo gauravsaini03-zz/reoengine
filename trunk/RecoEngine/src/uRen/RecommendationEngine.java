@@ -337,7 +337,7 @@ public class RecommendationEngine {
 	public String fbinterests()
 	{
 		String [] artist = new String[10];
-		FacebookClient facebookClient = new DefaultFacebookClient("2227470867|2.l7Sgb2w2iINoTe2nsRhjKw__.3600.1291741200-100000236469693|W_AITXkBId4qj64ecp6z3r1C6fE");        
+		FacebookClient facebookClient = new DefaultFacebookClient(SessionSettings.readFileAsString(SessionSettings.FileTokenVivek));        
 		FacebookClient[] facebookClientlist = new DefaultFacebookClient[10] ;
 		User user;int idx=0;
 
@@ -367,7 +367,7 @@ public class RecommendationEngine {
 					artist[i] = Name;
 			}
 
-			String query = "SELECT uid, name FROM user WHERE uid=661520015";// or uid=661520015 //Get only vivek & gaurav 
+			String query = "SELECT uid, name FROM user WHERE uid=" + SessionSettings.UIDBuzz + " or uid=" + SessionSettings.UIDGaurav + " or uid =" + SessionSettings.UIDShweta;// or uid=661520015 //Get only vivek & gaurav 
 			List<QueryResult> friends = facebookClient.executeQuery(query, QueryResult.class);
 			System.out.println("Users: " + friends);
 
@@ -377,9 +377,12 @@ public class RecommendationEngine {
 			for (QueryResult entry: friends)
 			{	
 				entry.idx=idx++;
-				if 
-				(entry.uid.equals("661520015"))	
-					entry.access_token ="2227470867|2.HWXuDPljhndE_7GHIOUIAA__.3600.1291741200-661520015|KeGE6sKDfigo5Gq-QcTE6XoTNQw" ;
+				if (entry.uid.equals(SessionSettings.UIDBuzz))	
+					entry.access_token =SessionSettings.readFileAsString(SessionSettings.FileTokenBuzz) ;
+				if (entry.uid.equals(SessionSettings.UIDGaurav))	
+					entry.access_token =SessionSettings.readFileAsString(SessionSettings.FileTokenGaurav) ;
+				if (entry.uid.equals(SessionSettings.UIDShweta))	
+					entry.access_token =SessionSettings.readFileAsString(SessionSettings.FileTokenShweta) ;
 
 				/*  if (entry.uid.equals("516264396"))
 
@@ -468,6 +471,9 @@ public class RecommendationEngine {
 
 	}
 
+	public ArrayList<Album> GetAllAlbums() {
+		return db.GetAllAlbums();
+	}
 
 	public Purchase GetPurchasesByCustomer(Customer cust) {
 		return db.GetAlbumsPurchasedByCustomer(cust);
