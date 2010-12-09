@@ -73,9 +73,9 @@ public class Recommendation implements Serializable{
 			if (album.getID() == alb.getID()) {
 				
 				//if the album already exists, increment its weight
-				int albumWeight = alb.getRecommendationWeight();
+				int albumWeight = album.getRecommendationWeight();
 				albumWeight += weight;
-				alb.setRecommendationWeight(albumWeight);
+				album.setRecommendationWeight(albumWeight);
 				
 				alreadyExists = true;
 				break; //stop searching

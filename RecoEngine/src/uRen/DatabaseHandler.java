@@ -312,6 +312,13 @@ public class DatabaseHandler {
 		return matchFound == true ? user : null; 
 	}
 	
+	public ArrayList<Album> GetAllAlbums() {
+		if (false == albumCacheValid) {
+			ForceAlbumCacheUpdate(); //force read of album table
+		}
+		return albumCache;
+	}
+	
 	public Album GetAlbumByName(String artistName, String albumName) {
 		if (false == albumCacheValid) {
 			ForceAlbumCacheUpdate(); //force read of album table

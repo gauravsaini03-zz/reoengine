@@ -146,8 +146,10 @@ public class main extends HttpServlet {
 		 * 6* - <snipped>
 		 */
 		
+		
 		//start the total turnaround timer
 		totalTurnaroundTime.Start();
+		
 		/*
 		 * 1 - Global Popularity
 		 */
@@ -213,17 +215,17 @@ public class main extends HttpServlet {
 			out.println( "alg5PerfTimer = " + alg5PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 			out.println( "alg3PerfTimer = " + alg3PerfTimer.GetExecTimeInMilliSeconds() + "<br>" );
 		}
-		out.println("<pre>");
+		//out.println("<pre>");
 		
-		String output = serializerXML.Serialize(results, "c:\\temp\\out.xml");
+		String output = serializerXML.Serialize(results, "C:\\apache-tomcat-7.0.0\\webapps\\RecoEngine\\out.xml");
 		
-		output = output.replace("<", "&lt");
-		output = output.replace(">", "&gt");
-		out.println(output);
-		
-		out.println("</pre>");
-		
-		out.println("<title> hello world! </title>"); 
+//		output = output.replace("<", "&lt");
+//		output = output.replace(">", "&gt");
+		//out.println(output);
+//		
+//		out.println("</pre>");
+//		
+//		out.println("<title> hello world! </title>"); 
 
 	}
 

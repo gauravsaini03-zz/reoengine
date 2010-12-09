@@ -18,7 +18,7 @@ public class XMLSerializer {
 		xenc.writeObject(obj);
 		xenc.flush();
 		String xmlOut = bos.toString();
-		xmlOut += xmlOut + "</java>";
+		xmlOut = xmlOut + "</java>"; //stupid thing fracks up the first tag!
 		Logger.Log(xmlOut);
 		
 		if ( fileName != "" && fileName.length() > 0) {
